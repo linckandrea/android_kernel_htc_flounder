@@ -88,3 +88,4 @@ obj-$(CONFIG_MODS) 		+= mods/
 obj-$(CONFIG_DENVER_CPU)	+= idle_test_t132.o
 obj-$(CONFIG_QCT_9K_MODEM)	+= qcom-mdm-9k/
 obj-$(CONFIG_UID_SYS_STATS) += uid_sys_stats.o
+obj-$(CONFIG_STATE_NOTIFIER)	+= state_notifier.o
