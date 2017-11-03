@@ -3,7 +3,7 @@ lib-y		:= bitops.o delay.o clear_user.o			\
 		   copy_page.o clear_page.o				\
 		   memchr.o memmove.o memset.o memcpy.o			\
 		   strchr.o strrchr.o					\
-		   string.o
+		   string.o tishift.o
 
 ifeq ($(CONFIG_KERNEL_MODE_NEON), y)
 obj-$(CONFIG_XOR_BLOCKS)	+= xor-neon.o
