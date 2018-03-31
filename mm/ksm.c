@@ -38,6 +38,7 @@
 #include <linux/oom.h>
 #include <linux/numa.h>
 #include <linux/show_mem_notifier.h>
+#include <linux/state_notifier.h>
 
 #include <asm/tlbflush.h>
 #include "internal.h"
@@ -49,6 +50,8 @@
 #define NUMA(x)		(0)
 #define DO_NUMA(x)	do { } while (0)
 #endif
+
+static struct notifier_block notif;
 
 /*
  * A few notes about the KSM scanning process,
@@ -238,6 +241,7 @@ static int ksm_nr_node_ids = 1;
 #define KSM_RUN_UNMERGE	2
 #define KSM_RUN_OFFLINE	4
 static unsigned long ksm_run = KSM_RUN_STOP;
+static unsigned long ksm_run_stored;
 static void wait_while_offlining(void);
 
 static DECLARE_WAIT_QUEUE_HEAD(ksm_thread_wait);
@@ -2378,6 +2382,44 @@ static ssize_t merge_across_nodes_store(struct kobject *kobj,
 KSM_ATTR(merge_across_nodes);
 #endif
 
+static int state_notifier_callback(struct notifier_block *this,
+                               unsigned long event, void *data)
+{
+        int err = 0;
+
+        if (ksm_run == KSM_RUN_STOP && ksm_run_stored == KSM_RUN_STOP)
+                return 0;
+
+        mutex_lock(&ksm_thread_mutex);
+        wait_while_offlining();
+
+        switch (event) {
+               case STATE_NOTIFIER_ACTIVE:
+                       ksm_run = ksm_run_stored;
+                       if (ksm_run & KSM_RUN_UNMERGE) {
+                               set_current_oom_origin();
+                               err = unmerge_and_remove_all_rmap_items();
+                               clear_current_oom_origin();
+                               if (err)
+                                       ksm_run = KSM_RUN_STOP;
+                       }
+                       break;
+               case STATE_NOTIFIER_SUSPEND:
+                       ksm_run_stored = ksm_run;
+                       ksm_run = KSM_RUN_STOP;
+                       break;
+               default:
+                       break;
+       }
+
+       mutex_unlock(&ksm_thread_mutex);
+
+       if (ksm_run & KSM_RUN_MERGE)
+               wake_up_interruptible(&ksm_thread_wait);
+
+       return NOTIFY_OK;
+}
+
 static ssize_t pages_shared_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buf)
 {
@@ -2449,6 +2491,8 @@ static int __init ksm_init(void)
 	struct task_struct *ksm_thread;
 	int err;
 
+	int ret = 0;
+
 	err = ksm_slab_init();
 	if (err)
 		goto out;
@@ -2478,7 +2522,9 @@ static int __init ksm_init(void)
 #endif
 
 	show_mem_notifier_register(&ksm_show_mem_notifier_block);
-	return 0;
+	notif.notifier_call = state_notifier_callback;
+	ret = state_register_client(&notif);
+	return ret;
 
 out_free:
 	ksm_slab_free();
