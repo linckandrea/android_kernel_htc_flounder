@@ -4,3 +4,9 @@ lib-y		:= bitops.o delay.o clear_user.o			\
 		   memchr.o memmove.o memset.o memcpy.o			\
 		   strchr.o strrchr.o					\
 		   string.o
+
+ifeq ($(CONFIG_KERNEL_MODE_NEON), y)
+obj-$(CONFIG_XOR_BLOCKS)	+= xor-neon.o
+CFLAGS_REMOVE_xor-neon.o	+= -mgeneral-regs-only
+CFLAGS_xor-neon.o		+= -ffreestanding
+endif
