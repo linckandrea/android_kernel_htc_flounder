@@ -38,6 +38,10 @@
 #include <linux/nvhost.h>
 #include <linux/of_address.h>
 
+#ifdef CONFIG_STATE_NOTIFIER
+#include <linux/state_notifier.h>
+#endif
+
 #include <mach/dc.h>
 #include <mach/fb.h>
 #include <mach/csi.h>
@@ -4141,6 +4145,9 @@ static void tegra_dc_dsi_enable(struct tegra_dc *dc)
 
 	if (dsi->out_ops && dsi->out_ops->enable)
 		dsi->out_ops->enable(dsi);
+#ifdef CONFIG_STATE_NOTIFIER
+	state_resume();
+#endif
 fail:
 	tegra_dc_io_end(dc);
 	mutex_unlock(&dsi->lock);
@@ -4958,6 +4965,9 @@ static void tegra_dc_dsi_disable(struct tegra_dc *dc)
 			}
 		}
 	}
+#ifdef CONFIG_STATE_NOTIFIER
+	state_suspend();
+#endif
 fail:
 	mutex_unlock(&dsi->lock);
 	tegra_dc_io_end(dc);
