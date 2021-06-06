@@ -4058,6 +4058,10 @@ static void tegra_dc_dsi_enable(struct tegra_dc *dc)
 		goto fail;
 	}
 
+#ifdef CONFIG_STATE_NOTIFIER
+	state_resume();
+#endif
+
 	/* Stop DC stream before configuring DSI registers
 	 * to avoid visible glitches on panel during transition
 	 * from bootloader to kernel driver
@@ -4145,9 +4149,6 @@ static void tegra_dc_dsi_enable(struct tegra_dc *dc)
 
 	if (dsi->out_ops && dsi->out_ops->enable)
 		dsi->out_ops->enable(dsi);
-#ifdef CONFIG_STATE_NOTIFIER
-	state_resume();
-#endif
 fail:
 	tegra_dc_io_end(dc);
 	mutex_unlock(&dsi->lock);
