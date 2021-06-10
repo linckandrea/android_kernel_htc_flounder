@@ -63,6 +63,8 @@ include/config
 include/generated
 arch/*/include/generated
 out
+AnyKernel3/Pop_kernel-flounder-O-rx-x.zip
+AnyKernel3/Image.gz-dtb
 
 # stgit generated dirs
 patches-*
