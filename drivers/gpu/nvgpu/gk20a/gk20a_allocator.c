@@ -844,7 +844,7 @@ int gk20a_allocator_init(struct gk20a_allocator *allocator,
 {
 	memset(allocator, 0, sizeof(struct gk20a_allocator));
 
-	strncpy(allocator->name, name, 32);
+	memcpy(allocator->name, name, 32);
 
 	allocator->block_cache =
 		kmem_cache_create(allocator->name,

@@ -188,7 +188,7 @@ int camera_dev_add_regmap(
 			goto csyncdev_add_regmap_unlock;
 		}
 		memset(new_csyncdev, 0, sizeof(struct camera_sync_dev));
-		strncpy(new_csyncdev->name, name, sizeof(new_csyncdev->name));
+		memcpy(new_csyncdev->name, name, sizeof(new_csyncdev->name));
 		INIT_LIST_HEAD(&new_csyncdev->list);
 		new_csyncdev->regmap = regmap;
 		new_csyncdev->num_used = 0;
