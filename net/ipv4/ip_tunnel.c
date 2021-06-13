@@ -292,7 +292,7 @@ static struct net_device *__ip_tunnel_create(struct net *net,
 			err = -E2BIG;
 			goto failed;
 		}
-		strlcpy(name, ops->kind, IFNAMSIZ);
+		memcpy(name, ops->kind, IFNAMSIZ);
 		strncat(name, "%d", 2);
 	}
 

@@ -276,7 +276,7 @@ static int caif_connect_req_to_link_param(struct cfcnfg *cnfg,
 		l->linktype = CFCTRL_SRV_UTIL;
 		l->endpoint = 0x00;
 		l->chtype = 0x00;
-		strncpy(l->u.utility.name, s->sockaddr.u.util.service,
+		memcpy(l->u.utility.name, s->sockaddr.u.util.service,
 			sizeof(l->u.utility.name)-1);
 		l->u.utility.name[sizeof(l->u.utility.name)-1] = 0;
 		caif_assert(sizeof(l->u.utility.name) > 10);
