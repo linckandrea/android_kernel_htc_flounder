@@ -367,7 +367,7 @@ el0_sync:
 	adr	x26, el0_sys
 	cmp	x24, #ESR_EL1_EC_SYS64		// configurable trap
 	b.eq	el0_sync_tramp
-	adr	x26, el0_sp_pc
+	adr	x26, el0_sys
 	cmp	x24, #ESR_EL1_EC_SP_ALIGN	// stack alignment exception
 	b.eq	el0_sync_tramp
 	adr 	x26, el0_sp_pc
