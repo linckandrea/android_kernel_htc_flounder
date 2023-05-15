@@ -18,7 +18,7 @@
 	#size-cells = <2>;
 
 	chosen {
-		bootargs = "noirqdebug tegraid=40.0.0.00.00 vmalloc=400M video=tegrafb console=ttyS0,115200n8 earlyprintk";
+		bootargs = "noirqdebug tegraid=40.0.0.00.00 vmalloc=400M video=tegrafb console=ttyS0,115200n8";
 		linux,initrd-start = <0x85000000>;
 		linux,initrd-end = <0x851bc400>;
 	};
